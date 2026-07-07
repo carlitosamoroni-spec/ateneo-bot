@@ -1,40 +1,23 @@
-import os
-import telebot
-from google import genai
-from google.genai import types
+import os, telebot, threading
 from flask import Flask
-from threading import Thread
-import time
+from google import genai
 
-# Configuración del servidor web
 app = Flask(__name__)
 @app.route('/')
-def home():
-    return "Bot activo"
+def home(): return "Bot activo"
 
-def run():
-    app.run(host='0.0.0.0', port=10000)
+def run_flask(): app.run(host='0.0.0.0', port=10000)
+threading.Thread(target=run_flask).start()
 
-# Iniciamos el servidor en segundo plano
-Thread(target=run).start()
-
-# Configuración del Bot
-TOKEN = os.getenv("TOKEN")
-GEMINI_KEY = os.getenv("GEMINI_KEY")
-
-client = genai.Client(api_key=GEMINI_KEY)
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(os.getenv("TOKEN"))
+client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
 
 @bot.message_handler(func=lambda m: True)
 def respuesta(m):
     try:
-        resultado = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=m.text,
-        )
-        bot.reply_to(m, resultado.text)
-    except Exception as e:
-        bot.reply_to(m, "Error en el sistema")
+        res = client.models.generate_content(model='gemini-2.5-flash', contents=m.text)
+        bot.reply_to(m, res.text)
+    except: bot.reply_to(m, "Error en el sistema")
 
 print("Iniciando Bot...")
-bot.infinity_polling(skip_pending=True)
+bot.infinity_polling()
