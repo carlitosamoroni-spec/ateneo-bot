@@ -2,6 +2,14 @@ import os
 import telebot
 from google import genai
 from google.genai import types
+from flask import Flask
+from threading import Thread
+
+app = Flask('')
+@app.route('/')
+def home(): return "Bot activo"
+def run(): app.run(host='0.0.0.0', port=10000)
+Thread(target=run).start()
 
 # TICKET Y KEY
 TOKEN = "8831948080:AAEhkyKNLStLdIIbZRmy_-UZpYYx-9wquMg"
@@ -24,4 +32,4 @@ def respuesta(m):
     except:
         bot.reply_to(m, "Error en el sistema.")
 
-bot.infinity_polling()
+bot.infinity_polling(skip_pending=True)
