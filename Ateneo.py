@@ -2,13 +2,7 @@ import os, telebot, threading
 from flask import Flask
 from google import genai
 
-app = Flask(__name__)
-@app.route('/')
-def home(): return "Bot activo"
-
-def run_flask(): app.run(host='0.0.0.0', port=10000)
-threading.Thread(target=run_flask).start()
-
+# 1. Configuración del Bot primero
 bot = telebot.TeleBot(os.getenv("TOKEN"))
 client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
 
@@ -19,5 +13,17 @@ def respuesta(m):
         bot.reply_to(m, res.text)
     except: bot.reply_to(m, "Error en el sistema")
 
-print("Iniciando Bot...")
-bot.infinity_polling()
+# 2. Arrancamos el bot en un hilo propio
+def run_bot():
+    print("Iniciando Bot...")
+    bot.infinity_polling()
+
+threading.Thread(target=run_bot).start()
+
+# 3. Flask al final
+app = Flask(__name__)
+@app.route('/')
+def home(): return "Bot activo"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
