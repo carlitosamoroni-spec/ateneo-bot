@@ -12,7 +12,7 @@ def run(): app.run(host='0.0.0.0', port=10000)
 Thread(target=run).start()
 
 # TICKET Y KEY
-TOKEN = "8831948080:AAEhkyKNLStLdIIbZRmy_-UZpYYx-9wquMg"
+TOKEN = os.getenv("TOKEN")
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 
 client = genai.Client(api_key=GEMINI_KEY)
